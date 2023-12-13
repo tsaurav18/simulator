@@ -1,0 +1,8 @@
+.calendar_icon{
+    display: flex!important;
+  justify-content: center!important;
+  flex-direction: row!important;
+  align-items: center;
+  border: 1px solid #b1b1b1;
+border-radius: 5px;
+}

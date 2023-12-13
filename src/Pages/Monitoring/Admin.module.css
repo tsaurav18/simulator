@@ -1,0 +1,268 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap');
+
+body {
+    font-family: 'Noto Sans KR', sans-serif !important;
+}
+
+.list_container {
+ 
+    border-radius: 10px;
+    height: 595px;
+    padding: 30px;
+}
+
+.title {
+    color: #323232;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+
+
+.active_selected_model{
+    background-color: #1d3a57!important;
+    color: #ffffff;
+}
+.deactive_selected_model{
+    background-color: #0A66C2!important;
+     color: #ffffff;
+}
+.button {
+    margin: 5px 4px;
+    align-items: center;
+    background-color: #0A66C2;
+    border: 0;
+    border-radius: 100px;
+    box-sizing: border-box;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: -apple-system, system-ui, system-ui, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    justify-content: center;
+    line-height: 20px;
+    max-width: 480px;
+    min-height: 40px;
+    min-width: 0px;
+    overflow: hidden;
+    padding: 0px;
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+    touch-action: manipulation;
+    transition: background-color 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s, box-shadow 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s, color 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s;
+    user-select: none;
+    -webkit-user-select: none;
+    vertical-align: middle;
+}
+
+.button:hover {
+    background-color: #16437E;
+    color: #ffffff;
+}
+
+.button:active {
+    background: #09223b;
+    color: rgb(255, 255, 255, .7);
+}
+
+.button:disabled {
+    cursor: not-allowed;
+    background: rgba(0, 0, 0, .08);
+    color: rgba(0, 0, 0, .3);
+}
+
+
+
+
+@media (min-width: 992px) {
+    .col-lg-12 {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+}
+
+
+@media (min-width: 1205px) {
+    .col-xl-8 {
+        flex: 0 0 auto;
+        width: 66.66666666%;
+    }
+
+    .col-xl-6 {
+        flex: 0 0 auto;
+        width: 50%;
+    }
+}
+
+
+
+
+@keyframes push {
+    0% {
+        opacity: 0;
+        transform: translateY(0px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(25px);
+    }
+}
+
+
+
+
+
+
+@media only screen and (max-width: 480px) {
+    .xpercent img {
+        height: 20px;
+        width: 20px;
+    }
+
+    .xpercent span {
+        font-size: 25px;
+        font-weight: bold;
+        letter-spacing: .4em;
+        cursor: pointer;
+    }
+
+    .infoHeader .top {
+        text-align: center;
+        padding: 0px;
+        font-size: 60px;
+        font-weight: bold;
+        margin-left: 80px;
+        line-height: 88px;
+    }
+
+    .infoHeader .bottom {
+        text-align: center;
+        font-weight: bold;
+        font-size: 40px;
+        padding: 10px 0 10px 0;
+        margin-right: 80px;
+    }
+}
+
+.date_container {
+    background-color: #eaf9f1;
+    padding: 7px 10px;
+    border-radius: 10px;
+}
+
+.active_date {
+    font-weight: bold;
+    color: #46c795;
+    font-size: 15px;
+    margin: 0px 3px;
+}
+
+.inactive_date {
+    color: #b2beba;
+    font-weight: bold;
+    font-size: 15px;
+    margin: 0px 3px;
+}
+
+.change_date {
+    cursor: pointer
+}
+
+.selectModel {
+    display: flex;
+    width: 60px;
+    height: 30px;
+    border: 3px solid;
+    border-radius: 99em;
+    position: relative;
+    transition: transform 0.75s ease-in-out;
+    transform-origin: 50% 50%;
+    cursor: pointer;
+}
+
+.selectModel:before {
+    transition: transform 0.75s ease;
+    /* transition-delay: 0.5s; */
+    content: "";
+    display: block;
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background-color: #000;
+    border-radius: 50%;
+    top: 5px;
+    left: 5px;
+}
+
+.toggleOff:before {
+    content: "OFF";
+    left: 24px;
+    position: absolute;
+    top: 2px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 600;
+    opacity: 1;
+    transition: opacity 0.75s ease;
+}
+
+.toggleOn:after {
+    content: "ON";
+    right: 28px;
+    position: absolute;
+    color: white;
+    top: 2px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.75s ease;
+}
+
+.selectSector label {
+    display: inline-block;
+    background-color: white;
+    color: #adadad;
+    border-radius: 10px;
+    white-space: nowrap;
+    margin: 3px 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: all .2s;
+    padding: 2px 6px;
+    cursor: pointer;
+    margin: 1px;
+}
+
+
+
+
+.analytics-card-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Centers the cards horizontally */
+  }
+  
+  .analytics-card {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin: 10px;
+    text-align: center;
+    background-color: #f5f5f5;
+    flex: 0 0 calc(20% - 20px); /* 5 cards in a row */
+    max-width: calc(20% - 20px); /* 5 cards in a row */
+  }
+  
+  .analytics-card-label {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .analytics-card-value {
+    font-size: 24px;
+    font-weight: bold;
+  }
