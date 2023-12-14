@@ -13,7 +13,8 @@ import classNames from "classnames";
 import { AiOutlineCalendar } from "react-icons/ai";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./Backtest.css";
 import { backtestApi } from "../../api";
 const customStyles = {
@@ -31,6 +32,15 @@ const customStyles = {
 Modal.setAppElement("#root");
 
 function Backtest() {
+  const [filterChildStates, setFilterChildStates] = useState([]);
+  // Function to add a new FilterChild state to the array
+  const addFilterChildState = () => {
+    setFilterChildStates((prevStates) => [
+      ...prevStates,
+      // createFilterChildState(), // Define createFilterChildState function accordingly
+    ]);
+  };
+
   const [showFilterDiv, setshowFilterDiv] = useState(false);
   const MODEL_TYPE = ["개별 모델", "모델"];
   const PRED_MODEL_TYPE = ["1일", "1주", "2주", "4주", "8주"];
@@ -41,6 +51,7 @@ function Backtest() {
   const [selectedStartDate, setStartSelectedDate] = useState(new Date());
   const [selectedEndDate, setSelectedEndDate] = useState(new Date());
 
+  
   const convertStartDate = () => {
     const date = new Date(selectedStartDate);
     const year = date.getFullYear();
@@ -70,12 +81,16 @@ function Backtest() {
   const [EndValue, onChangeEndDate] = useState(new Date());
   // for dynamic div
   const [filterContainer, setFilterContainer] = useState([]);
+
   const renderFilterDiv = () => {
     const temp = [...filterContainer];
     temp.push(1);
     setFilterContainer(temp);
     setshowFilterDiv(true);
   };
+
+
+
   const [filterGroupState, setFilterGroupState] = useState([
     { label: "R1 (기본 세팅 전용)", value: false },
     {
@@ -97,7 +112,9 @@ function Backtest() {
     { label: "R1.3 (부채비율)", value: false },
     { label: "R1.4 (잔고율)", value: false },
     { label: "R1.5 (비이슈종목)", value: false },
+    
   ]);
+  
   const [filterSecondGroupState, setFilterSecondGroupState] = useState([
     { label: "R2 (중복 섹터)", value: false },
     { label: "R3 (중복 종목)", value: false },
@@ -115,13 +132,30 @@ function Backtest() {
   ]);
 
   const runSimulation = async() => {
-    console.log("run simulation")
+    console.log("run simulation",currentSelectedStartDate,currentSelectedEndDate,modelType ,predModelType)
     try {
-
-      const res = await backtestApi.runSimulator(filterGroupState, filterSecondGroupState, filterThirdGroupState)
+      const final_state = [
+        currentSelectedStartDate,
+        currentSelectedEndDate,
+        modelType,
+        predModelType,
+        ...filterGroupState,
+        ...filterSecondGroupState,
+        ...filterThirdGroupState,
+      ];
+      console.log("final_state",final_state)
+      const res = await backtestApi.runSimulator(final_state)
       console.log("data", res.data)
+      if(res.status===200){
+        toast(res.data.response)
+      }
+
+      if (res.status==500){
+        toast("서버 접근이 안 됩니다. 관리자에게 문의해 주세요.");
+      }
     } catch (error) {
-      console.log("error")
+      toast("데이터를 불어오지 못했습니다.");
+      console.log("error Invalid Json", error)
     }
 
   };
@@ -198,7 +232,7 @@ function Backtest() {
     
 
    
-    console.log("FilterGroupState", filterGroupState,filterSecondGroupState, filterThirdGroupState);
+  
     return (
       <Container
         key={index}
@@ -535,6 +569,7 @@ function Backtest() {
           }}
         />
       </Modal>
+            <ToastContainer />
     </ThemeProvider>
   );
 }

@@ -1,16 +1,11 @@
 import { WEB_APP_ROUTES } from "../constants/Routes";
-import Home from "../../Pages/Home";
+
 import Monitoring from "../../Pages/Monitoring/Monitoring";
 import Backtest from "../../Pages/Backtest/Backtest";
 import Results from "../../Pages/Results/Results";
 
 const ROUTES = [
-  {
-    path: WEB_APP_ROUTES.HOME,
-    key: "home",
-    exact: true,
-    element: <Home />,
-  },
+
   {
     path: WEB_APP_ROUTES.MONITORING,
     key: "monitoring",

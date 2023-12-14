@@ -1,6 +1,6 @@
 export const WEB_APP_ROUTES = {
-  HOME: "/",
-  MONITORING: "/monitoring",
+
+  MONITORING: "/",
   BACKTEST: "/backtest",
   RESULTS: "/results",
 };

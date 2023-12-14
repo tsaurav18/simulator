@@ -47,14 +47,10 @@ xpctInstance.interceptors.request.use(
 
 export const backtestApi = {
   async runSimulator(
-    filterGroupState,
-    filterSecondGroupState,
-    filterThirdGroupState
+    final_state
   ) {
     let body = JSON.stringify({
-      filterGroupState: filterGroupState,
-      filterSecondGroupState: filterSecondGroupState,
-      filterThirdGroupState: filterThirdGroupState,
+      final_state: final_state
     });
 
     let csrf = await instance.get("backtest/get_csrf");
