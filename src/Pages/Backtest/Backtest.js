@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
 import { useMediaQuery } from "react-responsive";
@@ -17,6 +17,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Backtest.css";
 import { backtestApi } from "../../api";
+
 const customStyles = {
   content: {
     top: "50%",
@@ -33,12 +34,14 @@ Modal.setAppElement("#root");
 
 function Backtest() {
   const [filterChildStates, setFilterChildStates] = useState([]);
+  console.log("filterChildStates,",filterChildStates)
   // Function to add a new FilterChild state to the array
   const addFilterChildState = () => {
     setFilterChildStates((prevStates) => [
       ...prevStates,
-      // createFilterChildState(), // Define createFilterChildState function accordingly
+      createFilterChildState(), // Define createFilterChildState function accordingly
     ]);
+    setshowFilterDiv(true);
   };
 
   const [showFilterDiv, setshowFilterDiv] = useState(false);
@@ -79,71 +82,103 @@ function Backtest() {
   );
   const [value, onChange] = useState(new Date());
   const [EndValue, onChangeEndDate] = useState(new Date());
-  // for dynamic div
-  const [filterContainer, setFilterContainer] = useState([]);
-
-  const renderFilterDiv = () => {
-    const temp = [...filterContainer];
-    temp.push(1);
-    setFilterContainer(temp);
-    setshowFilterDiv(true);
-  };
-
-
-
-  const [filterGroupState, setFilterGroupState] = useState([
-    { label: "R1 (기본 세팅 전용)", value: false },
-    {
-      label: "R1.1 (시가총액)",
-      value: false,
-      input_flg: true,
-      input_val: "",
-      input_lbl: "억 (원)",
-      disableStatus:false
-    },
-    {
-      label: "R1.2 (평균거래대금)",
-      value: false,
-      input_flg: true,
-      input_val: "",
-      input_lbl: "억 (원)",
-      disableStatus:false
-    },
-    { label: "R1.3 (부채비율)", value: false },
-    { label: "R1.4 (잔고율)", value: false },
-    { label: "R1.5 (비이슈종목)", value: false },
-    
-  ]);
   
-  const [filterSecondGroupState, setFilterSecondGroupState] = useState([
-    { label: "R2 (중복 섹터)", value: false },
-    { label: "R3 (중복 종목)", value: false },
-    { label: "우선주 제외", value: false },
-  ]);
 
   const POST_FILTERING_LIST = ["없음", "KHK31-기본", "KHK31-완화"];
   const INVEST_STOCK_NO_LIST = [5,20];
   const DISTRIBUTE_INVEST_LIST = ['주 단위','일 단위'];
-  const [filterThirdGroupState, setFilterThirdGroupState] = useState([
-    { label: "포스트 필터링", value: POST_FILTERING_LIST[0], label_list:POST_FILTERING_LIST },
-    { label: "투자 종목 수", value: INVEST_STOCK_NO_LIST[0], label_list: INVEST_STOCK_NO_LIST},
-    { label: "분산 투자", value: DISTRIBUTE_INVEST_LIST[0] ,label_list:DISTRIBUTE_INVEST_LIST},
-    { label: "수수료", value: 0.0, lbl: "%", label_list:null},
-  ]);
+
+// Function to create an initial state for FilterChild
+
+
+const createFilterChildState = () => {
+  return {
+    filterGroupState: [
+      { label: "R1 (기본 세팅 전용)", value: false },
+      {
+        label: "R1.1 (시가총액)",
+        value: false,
+        input_flg: true,
+        input_val: "",
+        input_lbl: "억 (원)",
+        disableStatus: false,
+      },
+      {
+        label: "R1.2 (평균거래대금)",
+        value: false,
+        input_flg: true,
+        input_val: "",
+        input_lbl: "억 (원)",
+        disableStatus: false,
+      },
+      { label: "R1.3 (부채비율)", value: false },
+      { label: "R1.4 (잔고율)", value: false },
+      { label: "R1.5 (비이슈종목)", value: false },
+    ],
+    filterSecondGroupState: [
+      { label: "R2 (중복 섹터)", value: false },
+      { label: "R3 (중복 종목)", value: false },
+      { label: "우선주 제외", value: false },
+    ],
+    filterThirdGroupState: [
+      {
+        label: "포스트 필터링",
+        value: POST_FILTERING_LIST[0],
+        label_list: POST_FILTERING_LIST,
+      },
+      {
+        label: "투자 종목 수",
+        value: INVEST_STOCK_NO_LIST[0],
+        label_list: INVEST_STOCK_NO_LIST,
+      },
+      {
+        label: "분산 투자",
+        value: DISTRIBUTE_INVEST_LIST[0],
+        label_list: DISTRIBUTE_INVEST_LIST,
+      },
+      { label: "수수료", value: 0.0, lbl: "%", label_list: null },
+    ],
+  };
+};
+
+// Function to update the state of a specific FilterChild
+
+const updateFilterChildState = (index, updatedState) => {
+
+  setFilterChildStates((prevStates) => {
+    const newStates = [...prevStates];
+    newStates[index] = {
+      ...newStates[index],
+      ...updatedState,
+      filterGroupState: updatedState.filterGroupState
+        ? [...updatedState.filterGroupState]
+        : newStates[index].filterGroupState,
+      filterSecondGroupState: updatedState.filterSecondGroupState
+        ? [...updatedState.filterSecondGroupState]
+        : newStates[index].filterSecondGroupState,
+      filterThirdGroupState: updatedState.filterThirdGroupState
+        ? [...updatedState.filterThirdGroupState]
+        : newStates[index].filterThirdGroupState,
+    };
+    return newStates;
+  });
+};
+
 
   const runSimulation = async() => {
-    console.log("run simulation",currentSelectedStartDate,currentSelectedEndDate,modelType ,predModelType)
     try {
-      const final_state = [
+      let model_state = {
         currentSelectedStartDate,
         currentSelectedEndDate,
         modelType,
         predModelType,
-        ...filterGroupState,
-        ...filterSecondGroupState,
-        ...filterThirdGroupState,
+      }
+      const final_state = [
+        model_state,
+        ...filterChildStates
+       
       ];
-      console.log("final_state",final_state)
+      // console.log("final_state",final_state)
       const res = await backtestApi.runSimulator(final_state)
       console.log("data", res.data)
       if(res.status===200){
@@ -151,87 +186,79 @@ function Backtest() {
       }
 
       if (res.status==500){
-        toast("서버 접근이 안 됩니다. 관리자에게 문의해 주세요.");
+        toast("관리자에게 문의해 주세요.");
       }
     } catch (error) {
-      toast("데이터를 불어오지 못했습니다.");
+      toast("데이터를 불러오지 못했습니다.");
       console.log("error Invalid Json", error)
     }
 
   };
-
-
-  function FilterChild({ index,filterGroupState,filterSecondGroupState, filterThirdGroupState,setFilterGroupState, setFilterSecondGroupState, setFilterThirdGroupState}) {
-   
-    const handleCheckBoxChange = (item) => {
-      if (item.label === "R1 (기본 세팅 전용)") {
-        // Set all checkboxes to true
-        setFilterGroupState(
-          filterGroupState.map((el) => ({ ...el, value: !item.value,disableStatus:!item.value }))
-        );
-
-      } else {
-        // Update the clicked checkbox
-        setFilterGroupState((prevFilterGroupState) => {
-          return prevFilterGroupState.map((el) => {
-            if (el.label === item.label) {
-              return { ...el, value: !el.value };
-            }
-            return el;
-          });
-        });
-      }
-    };
-    const handleFilterCheckboxChange = (item) => {
-      setFilterSecondGroupState((prevFilterGroupState) => {
-        return prevFilterGroupState.map((el) => {
-          if (el.label === item.label) {
-            return { ...el, value: !el.value };
-          }
-          return el;
-        });
-      });
-    };
-
-
-    const handleFilterFirstGroupInputChange = (item, text) => {
-      console.log("item", item, text);
-      setFilterGroupState((prevFilterGroupState) => {
-        return prevFilterGroupState.map((el) => {
-          if (el.label === item.label) {
-            return { ...el, input_val: text.target.value };
-          }
-          return el;
-        });
-      });
-    };
-    const onHandlerPostFiltering = (item, text) => {
  
-      setFilterThirdGroupState((prevFilterGroupState) => {
-        return prevFilterGroupState.map((el) => {
-          if (el.label === item.label) {
-            return { ...el, value: text };
-          }
-          return el;
-        });
-      });
-    };
+ 
 
-    
-    const handleFilterInputChange = (item, t) => {
-      
-      setFilterThirdGroupState((prevFilterGroupState) => {
-        return prevFilterGroupState.map((el) => {
-          if (el.label === item.label) {
-            return { ...el, value: t.target.value };
-          }
-          return el;
-        });
-      });
-    };
-    
+  function FilterChild({ index,filterGroupState,filterSecondGroupState, filterThirdGroupState,updateFilterChildState}) {
 
-   
+
+   const handleCheckBoxChange = (item) => {
+    const updatedFilterGroupState = filterGroupState.map((el) => {
+      if (item.label === "R1 (기본 세팅 전용)") {
+        return { ...el, value: true, disableStatus: false };
+      } else if (el.label === item.label) {
+        return { ...el, value: !el.value };
+      }
+      return el;
+    });
+
+    updateFilterChildState(index,  { filterGroupState: [...updatedFilterGroupState] });
+  };
+
+  const handleFilterCheckboxChange = (item) => {
+    const updatedFilterSecondGroupState = filterSecondGroupState.map((el) => {
+      if (el.label === item.label) {
+        return { ...el, value: !el.value };
+      }
+      return el;
+    });
+
+    updateFilterChildState(index, { filterSecondGroupState: updatedFilterSecondGroupState });
+  };
+
+  const handleFilterFirstGroupInputChange = (item, text) => {
+    const updatedFilterGroupState = filterGroupState.map((el) => {
+      if (el.label === item.label) {
+        return { ...el, input_val: text.target.value };
+      }
+      return el;
+    });
+
+    updateFilterChildState(index, { filterGroupState: updatedFilterGroupState });
+  };
+
+  const onHandlerPostFiltering = (item, text) => {
+    const updatedFilterThirdGroupState = filterThirdGroupState.map((el) => {
+      if (el.label === item.label) {
+        return { ...el, value: text };
+      }
+      return el;
+    });
+
+    updateFilterChildState(index, { filterThirdGroupState: updatedFilterThirdGroupState });
+  };
+
+  const handleFilterInputChange = (item, t) => {
+    const updatedFilterThirdGroupState = filterThirdGroupState.map((el) => {
+      if (el.label === item.label) {
+        return { ...el, value: t.target.value };
+      }
+      return el;
+    });
+
+    updateFilterChildState(index, { filterThirdGroupState: updatedFilterThirdGroupState });
+  };
+
+
+  
   
     return (
       <Container
@@ -248,8 +275,9 @@ function Backtest() {
           direction="horizontal"
           className="d-flex align-items-start flex-row justify-content-start"
         >
-          <Col>
+          <Col >
             {" "}
+          
             {filterGroupState?.map((item, index) => (
               <Stack
                 direction="horizontal"
@@ -411,6 +439,7 @@ function Backtest() {
           backgroundColor: "#f5f5f5",
           border: "1px solid #f5f5f5",
           borderRadius: "7px",
+          marginBottom: "20px"
         }}
       >
         <Stack gap={2} style={{ padding: 20 }}>
@@ -484,21 +513,26 @@ function Backtest() {
         </Stack>
       </Container>
 
-      <div className="d-flex align-items-center justify-content-center m-xl-3">
+      <div style={{  marginBottom: "20px"}} className="d-flex align-items-center justify-content-center m-xl-3">
         <Button
           variant="secondary"
           size="ls"
           className="px-xl-5"
           onClick={() => {
-            renderFilterDiv();
+            // renderFilterDiv();
+            addFilterChildState();
           }}
         >
           추가
         </Button>
       </div>
 
-      {filterContainer?.map((_, index) => (
-        <FilterChild key={index} index={index} filterGroupState={filterGroupState} filterSecondGroupState={filterSecondGroupState} filterThirdGroupState={filterThirdGroupState} setFilterGroupState={setFilterGroupState}setFilterSecondGroupState={setFilterSecondGroupState} setFilterThirdGroupState={setFilterThirdGroupState}/>
+
+{filterChildStates?.map((childState, index) => (
+        <FilterChild   key={index}
+        index={index}
+        {...childState}
+        updateFilterChildState={updateFilterChildState}/>
       ))}
       <div className="d-flex align-items-center justify-content-center m-xl-3">
         {showFilterDiv && (
