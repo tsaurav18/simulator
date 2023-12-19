@@ -45,7 +45,7 @@ function Backtest() {
   };
 
   const [showFilterDiv, setshowFilterDiv] = useState(false);
-  const MODEL_TYPE = ["개별 모델", "모델"];
+  const MODEL_TYPE = ["개별 모델"];
   const PRED_MODEL_TYPE = ["1일", "1주", "2주", "4주", "8주"];
   const [modelType, setModelType] = useState(MODEL_TYPE[0]);
   const [predModelType, setPredModelType] = useState(PRED_MODEL_TYPE[0]);
@@ -416,12 +416,15 @@ const updateFilterChildState = (index, updatedState) => {
     setPredModelType(type);
   };
   const isDateDisabled = (date) => {
+   const current_date = new Date()
+ 
     // Disable dates before the selected start date
-    return date < selectedStartDate;
+    return date > current_date;
   };
   const isDateDisabled2 = (date) => {
+    const current_date = new Date()
     // Disable dates before the selected start date
-    return date > selectedEndDate;
+    return date > current_date;
   };
 
   return (
