@@ -43,12 +43,13 @@ function Backtest() {
     ]);
     setshowFilterDiv(true);
   };
-
+  const DISTRIBUTE_INVEST_LIST = ['주 단위','일 단위'];
   const [showFilterDiv, setshowFilterDiv] = useState(false);
   const MODEL_TYPE = ["개별 모델"];
   const PRED_MODEL_TYPE = ["1일", "1주", "2주", "4주", "8주"];
   const [modelType, setModelType] = useState(MODEL_TYPE[0]);
   const [predModelType, setPredModelType] = useState(PRED_MODEL_TYPE[0]);
+  const [investIntervalType, setInvestIntervalType] = useState(DISTRIBUTE_INVEST_LIST[0]);
   const [modalIsOpenStartDate, setModalIsOpenStartDate] = useState(false);
   const [modalIsOpenEndDate, setModalIsOpenEndDate] = useState(false);
   const [selectedStartDate, setStartSelectedDate] = useState(new Date());
@@ -86,7 +87,7 @@ function Backtest() {
 
   const POST_FILTERING_LIST = ["없음", "KHK31-기본", "KHK31-완화"];
   const INVEST_STOCK_NO_LIST = [5,20];
-  const DISTRIBUTE_INVEST_LIST = ['주 단위','일 단위'];
+
 
 // Function to create an initial state for FilterChild
 
@@ -131,11 +132,7 @@ const createFilterChildState = () => {
         value: INVEST_STOCK_NO_LIST[0],
         label_list: INVEST_STOCK_NO_LIST,
       },
-      {
-        label: "분산 투자",
-        value: DISTRIBUTE_INVEST_LIST[0],
-        label_list: DISTRIBUTE_INVEST_LIST,
-      },
+    
       { label: "수수료", value: 0.0, lbl: "%", label_list: null },
     ],
   };
@@ -172,10 +169,11 @@ const updateFilterChildState = (index, updatedState) => {
         currentSelectedEndDate,
         modelType,
         predModelType,
+        investIntervalType
       }
       const final_state = [
         model_state,
-        ...filterChildStates
+        filterChildStates
        
       ];
       // console.log("final_state",final_state)
@@ -415,6 +413,9 @@ const updateFilterChildState = (index, updatedState) => {
   const onHandlerPredModelType = (type) => {
     setPredModelType(type);
   };
+  const onHandlerInvestIntervalType = (type) => {
+    setInvestIntervalType(type);
+  };
   const isDateDisabled = (date) => {
    const current_date = new Date()
  
@@ -507,6 +508,25 @@ const updateFilterChildState = (index, updatedState) => {
               <Dropdown.Menu>
                 {PRED_MODEL_TYPE?.map((item) => (
                   <Dropdown.Item onClick={() => onHandlerPredModelType(item)}>
+                    {item}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
+          </Stack>
+
+          <Stack gap={2} direction="horizontal">
+            <div style={{ fontSize: 18, fontWeight: 600 }} className="p-2">
+              분산 투자:
+            </div>{" "}
+            <Dropdown>
+              <Dropdown.Toggle size="sm" id="dropdown-basic">
+                {investIntervalType}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                {DISTRIBUTE_INVEST_LIST?.map((item) => (
+                  <Dropdown.Item onClick={() => onHandlerInvestIntervalType(item)}>
                     {item}
                   </Dropdown.Item>
                 ))}
