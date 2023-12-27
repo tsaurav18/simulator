@@ -17,7 +17,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Backtest.css";
 import { backtestApi } from "../../api";
-
+import { Oval } from "react-loader-spinner";
+import MainNavbar from "../../Components/Navbar";
+import { useDispatch, useSelector } from "react-redux";
 const customStyles = {
   content: {
     top: "50%",
@@ -33,8 +35,9 @@ const customStyles = {
 Modal.setAppElement("#root");
 
 function Backtest() {
+  const user_info_reducer = useSelector((state) => state.loginReducer);
   const [filterChildStates, setFilterChildStates] = useState([]);
-  console.log("filterChildStates,",filterChildStates)
+  console.log("filterChildStates,",filterChildStates,user_info_reducer)
   // Function to add a new FilterChild state to the array
   const addFilterChildState = () => {
     setFilterChildStates((prevStates) => [
@@ -54,7 +57,7 @@ function Backtest() {
   const [modalIsOpenEndDate, setModalIsOpenEndDate] = useState(false);
   const [selectedStartDate, setStartSelectedDate] = useState(new Date());
   const [selectedEndDate, setSelectedEndDate] = useState(new Date());
-
+  const [simulationRunLoader, setSimulationRunLoader] = useState(false)
   
   const convertStartDate = () => {
     const date = new Date(selectedStartDate);
@@ -100,21 +103,22 @@ const createFilterChildState = () => {
         label: "R1.1 (시가총액)",
         value: false,
         input_flg: true,
-        input_val: "",
+        input_val: "0",
         input_lbl: "억 (원)",
         disableStatus: false,
       },
       {
         label: "R1.2 (평균거래대금)",
         value: false,
+
         input_flg: true,
-        input_val: "",
+        input_val: "0",
         input_lbl: "억 (원)",
         disableStatus: false,
       },
-      { label: "R1.3 (부채비율)", value: false },
-      { label: "R1.4 (잔고율)", value: false },
-      { label: "R1.5 (비이슈종목)", value: false },
+      { label: "R1.3 (부채비율)", value: false ,       disableStatus: false,},
+      { label: "R1.4 (잔고율)", value: false,       disableStatus: false, },
+      { label: "R1.5 (비이슈종목)", value: false,       disableStatus: false, },
     ],
     filterSecondGroupState: [
       { label: "R2 (중복 섹터)", value: false },
@@ -163,7 +167,11 @@ const updateFilterChildState = (index, updatedState) => {
 
 
   const runSimulation = async() => {
+    setSimulationRunLoader(true)
     try {
+      let user_info={
+        user_id:user_info_reducer.user_id
+      }
       let model_state = {
         currentSelectedStartDate,
         currentSelectedEndDate,
@@ -172,15 +180,20 @@ const updateFilterChildState = (index, updatedState) => {
         investIntervalType
       }
       const final_state = [
+        user_info,
         model_state,
         filterChildStates
        
       ];
-      // console.log("final_state",final_state)
+      console.log("final_state",final_state)
       const res = await backtestApi.runSimulator(final_state)
       console.log("data", res.data)
+      toast("시뮤레이션 실행되었습니다.");
+      setSimulationRunLoader(false)
       if(res.status===200){
+
         toast(res.data.response)
+        
       }
 
       if (res.status==500){
@@ -190,7 +203,7 @@ const updateFilterChildState = (index, updatedState) => {
       toast("데이터를 불러오지 못했습니다.");
       console.log("error Invalid Json", error)
     }
-
+    setSimulationRunLoader(false)
   };
  
  
@@ -201,7 +214,8 @@ const updateFilterChildState = (index, updatedState) => {
    const handleCheckBoxChange = (item) => {
     const updatedFilterGroupState = filterGroupState.map((el) => {
       if (item.label === "R1 (기본 세팅 전용)") {
-        return { ...el, value: true, disableStatus: false };
+
+        return { ...el, value: !el.value, disableStatus: !el.disableStatus };
       } else if (el.label === item.label) {
         return { ...el, value: !el.value };
       }
@@ -269,6 +283,7 @@ const updateFilterChildState = (index, updatedState) => {
           padding: 20,
         }}
       >
+    
         <Stack
           direction="horizontal"
           className="d-flex align-items-start flex-row justify-content-start"
@@ -285,6 +300,7 @@ const updateFilterChildState = (index, updatedState) => {
               >
                 <label>
                   <input
+                  disabled={index===0?false:item.disableStatus}
                     type="checkbox"
                     checked={item.value}
                     onChange={() => handleCheckBoxChange(item)}
@@ -301,7 +317,7 @@ const updateFilterChildState = (index, updatedState) => {
                     min="0"
                       style={{ width: "84px" }}
                       name={item.input_txt}
-                      onChange={(text) => {
+                      onInput={(text) => {
                         handleFilterFirstGroupInputChange(item, text);
                       }}
                     />
@@ -433,6 +449,7 @@ const updateFilterChildState = (index, updatedState) => {
       breakpoints={["xxxl", "xxl", "xl", "lg", "md", "sm", "xs", "xxs"]}
       minBreakpoint="xxs"
     >
+      <MainNavbar/>
       <Container>
         <Row style={{ margin: "10px 0px" }}>
           Start new backtesting simulation(s)
@@ -567,7 +584,21 @@ const updateFilterChildState = (index, updatedState) => {
               runSimulation();
             }}
           >
-            실행
+         {!simulationRunLoader ? "실행": <Oval
+                height={50}
+                width={50}
+                color="#fff"
+                wrapperStyle={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                wrapperClass=""
+                visible={true}
+                ariaLabel="oval-loading"
+                secondaryColor="#fff"
+                strokeWidth={2}
+                strokeWidthSecondary={2}
+              /> }   
           </Button>
         )}
       </div>

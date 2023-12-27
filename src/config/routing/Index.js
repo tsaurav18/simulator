@@ -3,8 +3,15 @@ import { WEB_APP_ROUTES } from "../constants/Routes";
 import Monitoring from "../../Pages/Monitoring/Monitoring";
 import Backtest from "../../Pages/Backtest/Backtest";
 import Results from "../../Pages/Results/Results";
+import Login from "../../Pages/Login/Login";
 
 const ROUTES = [
+  {
+    path: WEB_APP_ROUTES.LOGIN,
+    key: "login",
+    exact: true,
+    element: <Login />,
+  },
 
   {
     path: WEB_APP_ROUTES.MONITORING,

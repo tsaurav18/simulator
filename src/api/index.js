@@ -77,3 +77,46 @@ export const monitoringApi = {
     });
   },
 };
+
+export const loginAPI = {
+  async simulatorLogin(formdata) {
+    let body = JSON.stringify({
+      user_id: formdata.user_id,
+      password: formdata.user_pass,
+    });
+    let csrf = await instance.get("backtest/get_csrf");
+
+    return instance
+      .post(`backtest/login/`, body, {
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrf.data["token"],
+        },
+      })
+      .then((res) => {
+        return res;
+      });
+  },
+};
+export const resultAPI = {
+  async fetchUserResult(formdata) {
+    console.log("formdata",formdata)
+    let body = JSON.stringify({
+      user_id: formdata,
+    
+    });
+
+    let csrf = await instance.get("backtest/get_csrf");
+
+    return instance
+      .post(`backtest/user_result/`, body, {
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrf.data["token"],
+        },
+      })
+      .then((res) => {
+        return res;
+      });
+  },
+};

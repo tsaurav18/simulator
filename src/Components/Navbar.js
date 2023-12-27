@@ -5,8 +5,18 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { WEB_APP_ROUTES } from "../config/constants/Routes";
 import "./Navbar.css"
-function Navebar() {
- 
+import { resetState } from "../redux/slices/loginSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+function MainNavbar() {
+  const user_info_reducer = useSelector((state) => state.loginReducer);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const onLogout = () => {
+    dispatch(resetState());
+    navigate("/", { replace: true });
+  };
+  console.log("user_info_reducer",user_info_reducer)
   return (
     <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
       <Container>
@@ -19,7 +29,7 @@ function Navebar() {
             <Nav.Link  href={WEB_APP_ROUTES.RESULTS}>Result</Nav.Link>
           </Nav>
           <Nav>
-            <Nav.Link href="#deets">Logout</Nav.Link>
+            <Nav.Link href="/" onClick={()=>{onLogout()}}>Logout</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
@@ -27,4 +37,4 @@ function Navebar() {
   );
 }
 
-export default Navebar;
+export default MainNavbar;

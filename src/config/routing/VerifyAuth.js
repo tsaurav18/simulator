@@ -1,20 +1,16 @@
 import React from "react";
-import { Redirect } from "react-router-dom";
-import { WEB_APP_ROUTES } from "../constants/Routes";
-export const VerifyAuth = ({ component: Component, authRoles, ...rest }) => {
-  //   const user = useSelector(getUserSelector);
-  const user = "ADMIN";
+import Login from "../../Pages/Login/Login";
 
-  if (authRoles.includes(user)) {
-    console.log(authRoles.includes(user));
-    //for signed users and user is signed in
+export const VerifyAuth = ({ ComponentElement, auth_info, ...rest }) => {
 
-    return <Component {...rest} />;
+console.log("auth_info",auth_info)
+  if (auth_info.is_staff===true) {
+    return ComponentElement ;
   }
-  if (authRoles.length === 0 && user === "") {
+  if (auth_info.is_staff === false && auth_info.user_id === "") {
     //page is for only guest and user is signed OUT
-    return <Component {...rest} />;
+    return <Login/>;
   }
   // if page for signed users but user is unsigned IN
-  return <Component {...rest} />;
+  return <Login/>;
 };

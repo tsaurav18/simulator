@@ -18,6 +18,7 @@ import {
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import { monitoringApi } from "../../api";
+import MainNavbar from "../../Components/Navbar";
 
 ChartJS.register(
   CategoryScale,
@@ -247,7 +248,9 @@ const Monitoring = (props) => {
   }, [selectedModel]);
 
   return (
-    <Container>
+    <>  <MainNavbar/>
+        <Container>
+    
       <div
         className={s.list_container}
         style={{
@@ -1340,6 +1343,8 @@ const Monitoring = (props) => {
       </div>
       <Toaster />
     </Container>
+    </>
+
   );
 };
 
