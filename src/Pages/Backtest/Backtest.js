@@ -106,6 +106,7 @@ const createFilterChildState = () => {
         input_val: "0",
         input_lbl: "억 (원)",
         disableStatus: false,
+        inputDisableStatus:true
       },
       {
         label: "R1.2 (평균거래대금)",
@@ -115,6 +116,7 @@ const createFilterChildState = () => {
         input_val: "0",
         input_lbl: "억 (원)",
         disableStatus: false,
+        inputDisableStatus:true
       },
       { label: "R1.3 (부채비율)", value: false ,       disableStatus: false,},
       { label: "R1.4 (잔고율)", value: false,       disableStatus: false, },
@@ -168,6 +170,18 @@ const updateFilterChildState = (index, updatedState) => {
 
   const runSimulation = async() => {
     setSimulationRunLoader(true)
+
+    // filterChildStates.map(item=>{
+    //   console.log("item", item)
+    //   item.filterGroupState.map(ob=>{
+    //     if(ob.label==="R1.1 (시가총액)" && ob.value==true){
+    //       if(ob.input_val==="0")
+    //     }
+    //        console.log(ob.label)
+    //   })
+    // })
+
+
     try {
       let user_info={
         user_id:user_info_reducer.user_id
@@ -186,19 +200,27 @@ const updateFilterChildState = (index, updatedState) => {
        
       ];
       console.log("final_state",final_state)
-      const res = await backtestApi.runSimulator(final_state)
-      console.log("data", res.data)
-      toast("시뮤레이션 실행되었습니다.");
-      setSimulationRunLoader(false)
-      if(res.status===200){
-
-        toast(res.data.response)
-        
+      let DEBUG = false
+      if(DEBUG){
+        console.log("Debug mode")
+        setSimulationRunLoader(false)
+        return
+      }else{
+        const res = await backtestApi.runSimulator(final_state)
+        console.log("data", res.data)
+        toast("시뮤레이션 실행되었습니다.");
+        setSimulationRunLoader(false)
+        if(res.status===200){
+  
+          toast(res.data.response)
+          
+        }
+  
+        if (res.status==500){
+          toast("관리자에게 문의해 주세요.");
+        }
       }
-
-      if (res.status==500){
-        toast("관리자에게 문의해 주세요.");
-      }
+    
     } catch (error) {
       toast("데이터를 불러오지 못했습니다.");
       console.log("error Invalid Json", error)
@@ -214,10 +236,16 @@ const updateFilterChildState = (index, updatedState) => {
    const handleCheckBoxChange = (item) => {
     const updatedFilterGroupState = filterGroupState.map((el) => {
       if (item.label === "R1 (기본 세팅 전용)") {
+   if(item.value){
 
-        return { ...el, value: !el.value, disableStatus: !el.disableStatus };
+    return { ...el, value: !el.value, disableStatus: !el.disableStatus ,  inputDisableStatus:true};
+   }else{
+ 
+    return { ...el, value: !el.value, disableStatus: !el.disableStatus ,  inputDisableStatus:true};
+   }
+     
       } else if (el.label === item.label) {
-        return { ...el, value: !el.value };
+        return { ...el, value: !el.value ,  inputDisableStatus:!el. inputDisableStatus };
       }
       return el;
     });
@@ -312,7 +340,7 @@ const updateFilterChildState = (index, updatedState) => {
                   <label>
                     <input
                     value={item.input_val}
-                    disabled={item.disableStatus}
+                    disabled={item.inputDisableStatus}
                     type="number"
                     min="0"
                       style={{ width: "84px" }}
