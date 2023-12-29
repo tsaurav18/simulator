@@ -37,7 +37,7 @@ Modal.setAppElement("#root");
 function Backtest() {
   const user_info_reducer = useSelector((state) => state.loginReducer);
   const [filterChildStates, setFilterChildStates] = useState([]);
-  console.log("filterChildStates,",filterChildStates,user_info_reducer)
+  console.log("filterChildStates,",filterChildStates)
   // Function to add a new FilterChild state to the array
   const addFilterChildState = () => {
     setFilterChildStates((prevStates) => [
@@ -52,7 +52,8 @@ function Backtest() {
   const PRED_MODEL_TYPE = ["1일", "1주", "2주", "4주", "8주"];
   const [modelType, setModelType] = useState(MODEL_TYPE[0]);
   const [predModelType, setPredModelType] = useState(PRED_MODEL_TYPE[0]);
-  const [investIntervalType, setInvestIntervalType] = useState(DISTRIBUTE_INVEST_LIST[0]);
+  const [investIntervalType, setInvestIntervalType] = useState(DISTRIBUTE_INVEST_LIST[1]);
+  const [investIntervalEnableFlag, setinvestIntervalEnableFlag] = useState(true)
   const [modalIsOpenStartDate, setModalIsOpenStartDate] = useState(false);
   const [modalIsOpenEndDate, setModalIsOpenEndDate] = useState(false);
   const [selectedStartDate, setStartSelectedDate] = useState(new Date());
@@ -200,7 +201,7 @@ const updateFilterChildState = (index, updatedState) => {
        
       ];
       console.log("final_state",final_state)
-      let DEBUG = false
+      let DEBUG = true
       if(DEBUG){
         console.log("Debug mode")
         setSimulationRunLoader(false)
@@ -455,9 +456,19 @@ const updateFilterChildState = (index, updatedState) => {
     setModelType(type);
   };
   const onHandlerPredModelType = (type) => {
+    console.log("type onHandlerPredModelType", type)
+    if(type==="1일"){
+      setInvestIntervalType("일 단위");
+      setinvestIntervalEnableFlag(true)
+
+    }
+    else{
+      setinvestIntervalEnableFlag(false)
+    }
     setPredModelType(type);
   };
   const onHandlerInvestIntervalType = (type) => {
+    console.log("type onHandlerInvestIntervalType", type)
     setInvestIntervalType(type);
   };
   const isDateDisabled = (date) => {
@@ -569,9 +580,9 @@ const updateFilterChildState = (index, updatedState) => {
                 {investIntervalType}
               </Dropdown.Toggle>
 
-              <Dropdown.Menu>
+              <Dropdown.Menu >
                 {DISTRIBUTE_INVEST_LIST?.map((item) => (
-                  <Dropdown.Item onClick={() => onHandlerInvestIntervalType(item)}>
+                  <Dropdown.Item disabled={investIntervalEnableFlag} onClick={() => onHandlerInvestIntervalType(item)}>
                     {item}
                   </Dropdown.Item>
                 ))}

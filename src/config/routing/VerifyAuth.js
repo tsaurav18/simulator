@@ -3,7 +3,7 @@ import Login from "../../Pages/Login/Login";
 
 export const VerifyAuth = ({ ComponentElement, auth_info, ...rest }) => {
 
-console.log("auth_info",auth_info)
+// console.log("auth_info",auth_info)
   if (auth_info.is_staff===true) {
     return ComponentElement ;
   }

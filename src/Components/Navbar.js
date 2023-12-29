@@ -16,7 +16,7 @@ function MainNavbar() {
     dispatch(resetState());
     navigate("/", { replace: true });
   };
-  console.log("user_info_reducer",user_info_reducer)
+  // console.log("user_info_reducer",user_info_reducer)
   return (
     <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
       <Container>
