@@ -201,7 +201,7 @@ const updateFilterChildState = (index, updatedState) => {
        
       ];
       console.log("final_state",final_state)
-      let DEBUG = false
+      let DEBUG = true
       if(DEBUG){
         console.log("Debug mode")
         setSimulationRunLoader(false)
