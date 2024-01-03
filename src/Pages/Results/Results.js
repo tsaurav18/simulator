@@ -24,13 +24,13 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
-
   Tooltip,
   Legend,
   zoomPlugin
 );
 const LineChart = ({data}) => {
-  console.log("data>>>>>>>>>>>>>>>",data)
+  let simulator_title='';
+  // console.log("data>>>>>>>>>>>>>>>",data)
   let _borderColorList = [
     "rgb(53, 162, 235)",
     "rgb(255, 99, 132)",
@@ -53,18 +53,72 @@ const LineChart = ({data}) => {
   ];
   // Group data by unique first elements of the tuple
   const groupedData = {};
+  let model_type_dict= {"stock":"개별 종목"}
+  let pred_days_dict = {"1":"1일", "5":"1주", "10":"2주", "20":"4주","40":"8주" }
   Object.entries(data).forEach(([key, values]) => {
-    const firstElement = key[0];
-      console.log("firstElement",key[0])
+    console.log("values", JSON.parse(values["data"]))
+    let parsed_data = JSON.parse(values["data"])
+    simulator_title = "["+ String(parsed_data["date_from"])+"~" +String(parsed_data["date_to"])+"]"+ " " + String(model_type_dict[parsed_data["model_type"]])+" - "+ String(pred_days_dict[parsed_data["pred_days"]]) + " " +"모델"
+
+    let r1_1 = parsed_data["r1_1"]
+    let r1_2 = parsed_data["r1_2"]
+    let r1_3 = parsed_data["r1_3"]
+    let r1_4 = parsed_data["r1_4"]
+    let r1_5 = parsed_data["r1_5"]
+    let r2 = parsed_data["r2"]
+    let r3 = parsed_data["r3"]
+    let r1_default = parsed_data["r1_default"]
+    let remove_preferred = parsed_data["remove_preferred"]
+    let transaction_fee = parsed_data["transaction_fee"]
+    let post_filtering = parsed_data["post_filtering"]
+    let num_stocks = parsed_data["num_stocks"]  //투자 종목 수 
+    let invest_interval = parsed_data["invest_interval"] //분산 투자
+    let model_type = parsed_data["model_type"] //예측 모델 
+    let invest_inverval_dict = {"weekly":"주 단위", "daily":"일 단위"}
+    let filterLabel = `필터링:`
+    if(r1_default===1){
+      filterLabel=  filterLabel+ ` R1, R2, R3, R4, R5,`
+    }else if(r1_1===1){
+      filterLabel=filterLabel+ ` R1,`
+    }else if(r1_2===1){
+      filterLabel=filterLabel+ ` R2,`
+    }else if(r1_3===1){
+      filterLabel=filterLabel+ ` R3,`
+    }else if(r1_4===1){
+      filterLabel= filterLabel+ ` R4,`
+    }else if(r1_5===1){
+      filterLabel= filterLabel+ ` R5,`
+    }
+    if(remove_preferred===1){
+      filterLabel= filterLabel+ ` 우선주 제외,`
+    }
+    if(post_filtering!=null){
+      filterLabel = filterLabel + `${post_filtering}`
+    }
+    if(num_stocks!=""){
+      filterLabel= filterLabel+ `투자 종목 수: Top ${num_stocks}`
+    }
+    if(invest_interval!=""){
+      filterLabel= filterLabel+ `분산 투자: ${invest_inverval_dict[invest_interval]}`
+    }
+    if(transaction_fee!=null){
+      filterLabel= filterLabel+ `수수료: ${transaction_fee}%`
+    }
+  // console.log("filterLabel", filterLabel)
+    let firstElement = key[0];
+      // console.log("firstElement",key[0])
     if (!groupedData[firstElement]) {
       groupedData[firstElement] = [];
     }
     groupedData[firstElement].push({
-      label: key[1],
-      data: values.map((item) => ({ x: item.date, y: item.pv })),
+      label:filterLabel,
+      data: values["chart_data"].map((item) => ({ x: item.date, y: item.pv })),
     });
+    console.log("groupedData",groupedData)
   });
+  
 
+ 
   // Format datasets
   const datasets = Object.values(groupedData).map((group, index) => {
     return {
@@ -95,25 +149,37 @@ const LineChart = ({data}) => {
         display: false, // Set to false to remove data labels
       },
       zoom: {
+      
+      zoom: {
         pan: {
           enabled: true,
           mode: "x",
+         
         },
         zoom: {
           pinch: {
             enabled: true, // Enable pinch zooming
+         
           },
           wheel: {
             enabled: true, // Enable wheel zooming
           },
           mode: "x",
-
-        
+          sensitivity: 0.1,
         },
       },
     },
+      legend: {
+        position: "right",
+      },
+    },
   };
-  return <Line data={{ datasets }} options={options} />;
+  return <Col style={{width:"100%", padding:"10px"}}>
+    <div style={{fontSize: "18px",
+    fontWeight: "600", textAlign: "left",
+    width: "100%",
+    padding: "18px 10px"}}>{simulator_title}</div>
+    <Line data={{ datasets }} options={options}/></Col>
 };
 
 
@@ -127,36 +193,39 @@ export default function Results() {
   console.log("resultDataList",resultDataList)
  const getUserResults=async()=>{
     setLoader(true);
-    const res = await resultAPI.fetchUserResult(user_info_reducer.user_id);
-    if (res.status === 200) {
-      if (res.data) {
-
-        setResultDataList(JSON.parse(res.data))
-        // dispatch(saveDataState(JSON.parse(res.data)));
-      }
-      
-    } else if (res.status == 400) {
-      // toast("인터넷 장애로 인하여 정보를 못 가져왔습니다. 다시 로그인하세요.");
-      const res = await resultAPI.fetchUserResult(user_info_reducer.user_id);
+    try{ const res = await resultAPI.fetchUserResult(user_info_reducer.user_id);
       if (res.status === 200) {
-
         if (res.data) {
+  
           setResultDataList(JSON.parse(res.data))
-          // dispatch(saveDataState(res.data));
-
-          
+          // dispatch(saveDataState(JSON.parse(res.data)));
         }
-      }else if(res.status===400){
-        toast("데이터가 없습니다.");
-      }
-   
-    } else {
-      if (res.data.msg) {
-        toast(res.data.msg);
-
-        setLoader(false);
-      }
-    }
+        
+      } else if (res.status == 400) {
+        // toast("인터넷 장애로 인하여 정보를 못 가져왔습니다. 다시 로그인하세요.");
+        const res = await resultAPI.fetchUserResult(user_info_reducer.user_id);
+        if (res.status === 200) {
+  
+          if (res.data) {
+            setResultDataList(JSON.parse(res.data))
+            // dispatch(saveDataState(res.data));
+  
+            
+          }
+        }else if(res.status===400){
+          toast("데이터가 없습니다.");
+        }
+     
+      } else {
+        if (res.data.msg) {
+          toast(res.data.msg);
+  
+          setLoader(false);
+        }
+      }}
+   catch{
+    toast("서버 접속 에러. 관리자에게 문의하세요. ")
+   }
     
     setLoader(false);
   };
@@ -173,7 +242,7 @@ export default function Results() {
     <div>
       <MainNavbar />
       <Container style={{ marginTop: 20 }}>
-        <ShadowCol>
+      
           {loader?  <Oval
                 height={50}
                 width={50}
@@ -188,12 +257,14 @@ export default function Results() {
                 secondaryColor="#fff"
                 strokeWidth={2}
                 strokeWidthSecondary={2}
-              />:resultDataList?   <Row>
-              <Col><Row >{Object.keys(resultDataList).length>0 &&<LineChart data= {resultDataList}/>}</Row></Col>
-              <Col>model description</Col>
+              />:resultDataList?   <Row style={{width:"100%"}}>
+              <Col style={{ height:"100%"}}>{Object.keys(resultDataList).length>0 &&<Col>{Object.keys(resultDataList).map(k=><ShadowCol style={{ width:"900px", height:"100%", marginBottom:20}}>
+               
+                <LineChart data= {resultDataList[k]}/></ShadowCol>)}</Col>}</Col>
+              {/* <Col>model description</Col> */}
             </Row>:<Row>데이터가 없습니다. </Row>}
         
-        </ShadowCol>
+  
       </Container>
       <ToastContainer/>
     </div>

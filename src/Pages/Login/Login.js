@@ -18,7 +18,6 @@ function Login() {
     user_id: "",
     user_pass: "",
   });
-console.log("login function")
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
@@ -34,36 +33,42 @@ console.log("login function")
       return;
     }
     setLoader(true);
-    const res = await loginAPI.simulatorLogin(formInput);
-    if (res.status === 200) {
-      if (res.data) {
-        dispatch(loginInfo(res.data));
-        setFormInput({ user_id: "", user_pass: "" });
-        navigate("/monitoring");
-      }
-    } else if (res.status == 400) {
-      // toast("인터넷 장애로 인하여 정보를 못 가져왔습니다. 다시 로그인하세요.");
+    try{
       const res = await loginAPI.simulatorLogin(formInput);
       if (res.status === 200) {
-        console.log("res.status", res.data)
         if (res.data) {
           dispatch(loginInfo(res.data));
-          // toast("로그인 되었습니다.");
           setFormInput({ user_id: "", user_pass: "" });
           navigate("/monitoring");
         }
-      }else if(res.status===400){
-        toast("미등록된 아이디입니다.");
-      }
-      setLoader(false);
-    } else {
-      if (res.data.msg) {
-        toast(res.data.msg);
-
+      } else if (res.status == 400) {
+        // toast("인터넷 장애로 인하여 정보를 못 가져왔습니다. 다시 로그인하세요.");
+        const res = await loginAPI.simulatorLogin(formInput);
+        if (res.status === 200) {
+          console.log("res.status", res.data)
+          if (res.data) {
+            dispatch(loginInfo(res.data));
+            // toast("로그인 되었습니다.");
+            setFormInput({ user_id: "", user_pass: "" });
+            navigate("/monitoring");
+          }
+        }else if(res.status===400){
+          toast("미등록된 아이디입니다.");
+        }
         setLoader(false);
+      } else {
+        if (res.data.msg) {
+          toast(res.data.msg);
+  
+          setLoader(false);
+        }
       }
+      
     }
-    
+   catch{
+    toast("서버 접속 에러. 관리자에게 문의하세요.");
+
+   }
     setLoader(false);
   };
 
