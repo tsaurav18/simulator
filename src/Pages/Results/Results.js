@@ -54,12 +54,13 @@ const LineChart = ({data}) => {
   ];
   // Group data by unique first elements of the tuple
   const groupedData = {};
+  let invest_inverval_dict = {"weekly":"주 단위", "daily":"일 단위"}
   let model_type_dict= {"stock":"개별 종목"}
   let pred_days_dict = {"1":"1일", "5":"1주", "10":"2주", "20":"4주","40":"8주" }
   Object.entries(data).forEach(([key, values]) => {
     console.log("values", JSON.parse(values["data"]))
     let parsed_data = JSON.parse(values["data"])
-    simulator_title = "["+ String(parsed_data["date_from"])+"~" +String(parsed_data["date_to"])+"]"+ " " + String(model_type_dict[parsed_data["model_type"]])+" - "+ String(pred_days_dict[parsed_data["pred_days"]]) + " " +"모델"
+    simulator_title = "["+ String(parsed_data["date_from"])+"~" +String(parsed_data["date_to"])+"]"+ " " + String(model_type_dict[parsed_data["model_type"]])+" - "+ String(pred_days_dict[parsed_data["pred_days"]]) + " " +"모델" + " (분산 투자: "+invest_inverval_dict[parsed_data["invest_interval"]]+")"
 
     let r1_1 = parsed_data["r1_1"]
     let r1_2 = parsed_data["r1_2"]
@@ -73,22 +74,24 @@ const LineChart = ({data}) => {
     let transaction_fee = parsed_data["transaction_fee"]
     let post_filtering = parsed_data["post_filtering"]
     let num_stocks = parsed_data["num_stocks"]  //투자 종목 수 
-    let invest_interval = parsed_data["invest_interval"] //분산 투자
+    // let invest_interval = parsed_data["invest_interval"] //분산 투자
     let model_type = parsed_data["model_type"] //예측 모델 
-    let invest_inverval_dict = {"weekly":"주 단위", "daily":"일 단위"}
+   
     let filterLabel = `필터링: `
     if(r1_default===1){
       filterLabel=  filterLabel+ `R1, `
-    }else if(r1_1===1){
-      filterLabel=filterLabel+ `R1.1, `
-    }else if(r1_2===1){
-      filterLabel=filterLabel+ `R1.2, `
-    }else if(r1_3===1){
-      filterLabel=filterLabel+ `R1.3, `
-    }else if(r1_4===1){
-      filterLabel= filterLabel+ `R1.4, `
-    }else if(r1_5===1){
-      filterLabel= filterLabel+ `R1.5, `
+    }else {
+      if(r1_1>0){
+        filterLabel=filterLabel+ `R1.1-${r1_1}억, `
+      }if(r1_2>0){
+        filterLabel=filterLabel+ `R1.2-${r1_2}억, `
+      }if(r1_3===1){
+        filterLabel=filterLabel+ `R1.3, `
+      }if(r1_4===1){
+        filterLabel= filterLabel+ `R1.4, `
+      }if(r1_5===1){
+        filterLabel= filterLabel+ `R1.5, `
+      }
     }
     if(r2===1){
       filterLabel=filterLabel+ `R2, `
@@ -105,9 +108,9 @@ const LineChart = ({data}) => {
     if(num_stocks!=="" && num_stocks!==null){
       filterLabel= filterLabel+ `투자 종목 수: Top ${num_stocks}, `
     }
-    if(invest_interval!==""){
-      filterLabel= filterLabel+ `분산 투자: ${invest_inverval_dict[invest_interval]}, `
-    }
+    // if(invest_interval!==""){
+    //   filterLabel= filterLabel+ `분산 투자: ${invest_inverval_dict[invest_interval]}, `
+    // }
     if(transaction_fee!==null){
       filterLabel= filterLabel+ `수수료: ${transaction_fee}%`
     }
@@ -259,7 +262,7 @@ export default function Results() {
  
       <Container style={{ marginTop: 20}}>
       <div className="filter_box" onClick={()=>handleClick()} style={{width:"100%"}}>
-       <div style={{ fontWeight:"700"}}> 필터 옾션 설명서</div>
+       <div style={{ fontWeight:"700"}}> 필터 옵션 설명</div>
         {isOpen && <div style={{marginTop:"10px"}}>
           
           <p><span style={{fontWeight:"700"}}> R1:</span> <span>기본 세팅 전용 (R1.1, R1.2, R1.3, R1.4, R1.5)</span></p>
@@ -269,8 +272,8 @@ export default function Results() {
           <p><span style={{fontWeight:"700"}}>R1.4:</span> <span>잔고율 </span></p>
           <p><span style={{fontWeight:"700"}}>R1.5:</span> <span>비이슈종목</span></p>
         
-          <p><span style={{fontWeight:"700"}}>R2:</span> <span>종복 섹터</span></p>
-          <p><span style={{fontWeight:"700"}}>R3: </span><span>종복 종목</span></p>
+          <p><span style={{fontWeight:"700"}}>R2:</span> <span>중복 섹터</span></p>
+          <p><span style={{fontWeight:"700"}}>R3: </span><span>중복 종목</span></p>
           
     
           </div> }

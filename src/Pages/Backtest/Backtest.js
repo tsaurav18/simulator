@@ -209,7 +209,7 @@ const updateFilterChildState = (index, updatedState) => {
       }else{
         const res = await backtestApi.runSimulator(final_state)
         console.log("data", res.data)
-        toast("시뮤레이션 실행되었습니다.");
+        toast("시뮬레이션 실행되었습니다.");
         setSimulationRunLoader(false)
         if(res.status===200){
   
